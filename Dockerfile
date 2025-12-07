@@ -1,13 +1,17 @@
-FROM python:3.7
+FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt ./
+# Install dependencies (CPU-only PyTorch)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
-RUN pip install -r requirements.txt
+# Copy script
+COPY meteor.py .
 
-RUN python -c "from pytorch_transformers import GPT2Tokenizer, GPT2LMHeadModel; GPT2Tokenizer.from_pretrained('gpt2-medium'); GPT2LMHeadModel.from_pretrained('gpt2-medium')"
+# Pre-download the model
+RUN python -c "from transformers import AutoModelForCausalLM, AutoTokenizer; \
+    AutoTokenizer.from_pretrained('Qwen/Qwen3-0.6B', trust_remote_code=True); \
+    AutoModelForCausalLM.from_pretrained('Qwen/Qwen3-0.6B', trust_remote_code=True)"
 
-COPY *.py .
-
-ENTRYPOINT ["python3", "meteor.py"]
+ENTRYPOINT ["python", "meteor.py"]

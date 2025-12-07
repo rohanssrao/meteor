@@ -1,18 +1,50 @@
-# Meteor: https://meteorfrom.space/
+# Meteor
 
-Meteor is a provably-secure symmetric-key steganography algorithm that encode & decodes messages with an LLM (GPT-2). Its encoded messages are statistically indistinguishable from regular LLM outputs.
+Cryptographically secure steganography using Qwen3-0.6B.
 
-```console
-# Encode our message
-$ docker run ghcr.io/rohanssrao/meteor:0.0.1 encode \
-  --message "test message" \
-  --password "password123"
- In the background, there is the apparent question of how to present to a user a wide variety of expressive values, but what scenario should
+Meteor encodes secret messages into innocent-looking AI-generated text. The encoded messages are statistically indistinguishable from regular LLM outputs.
 
-# Decode to get the message back
-$ docker run ghcr.io/rohanssrao/meteor:0.0.1 decode \
-  --message " In the background, there is the apparent question of how to present to a user a wide variety of expressive values, but what scenario should" \
-  --password "password123"
-test message
+An unofficial implementation of the ideas in the [original Meteor paper](https://eprint.iacr.org/2021/686) by Kaptchuk, Jois, Green, and Rubin. An explanation of Meteor can be found at this link: https://meteorfrom.space
+
+## Usage
+
+### With Docker
+
+```bash
+docker run ghcr.io/rohanssrao/meteor:1.0.0 encode --message "secret" --password "pass"
+docker run ghcr.io/rohanssrao/meteor:1.0.0 decode --message "<stegotext>" --password "pass"
 ```
 
+### With uv
+
+```bash
+uv run meteor.py encode --message "secret" --password "pass"
+```
+
+## Custom Context
+
+You can control the initial context of the generated text with `--context`:
+
+```bash
+python meteor.py encode --message "secret" --password "pass" \
+  --context "The history of ancient Rome"
+```
+
+**Important:** The context, password, and stegotext must all match exactly when decoding. If you use a custom context during encoding, you must provide the same context when decoding:
+
+```bash
+# Encode with custom context
+python meteor.py encode --message "secret" --password "pass" \
+  --context "The history of ancient Rome"
+
+# Decode
+python meteor.py decode --message "<stegotext>" --password "pass" \
+  --context "The history of ancient Rome"
+```
+
+## How It Works
+
+1. Your message is converted to bits
+2. These bits guide token selection from the LLM's probability distribution
+3. The selected tokens form natural-looking text
+4. Decoding reverses the process using the same password and context
