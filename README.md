@@ -4,7 +4,7 @@ Cryptographically secure steganography using Qwen3-0.6B.
 
 Meteor encodes secret messages into innocent-looking AI-generated text. The encoded messages are statistically indistinguishable from regular LLM outputs.
 
-An unofficial implementation of the ideas in the [original Meteor paper](https://eprint.iacr.org/2021/686) by Kaptchuk, Jois, Green, and Rubin. An explanation of Meteor can be found at this link: https://meteorfrom.space
+This is an unofficial implementation of the ideas in the [original Meteor paper](https://eprint.iacr.org/2021/686) by Kaptchuk, Jois, Green, and Rubin, adapted for a modern LLM. An explanation of Meteor can be found at this link: https://meteorfrom.space
 
 ## Usage
 
@@ -26,7 +26,7 @@ uv run meteor.py encode --message "secret" --password "pass"
 You can control the initial context of the generated text with `--context`:
 
 ```bash
-python meteor.py encode --message "secret" --password "pass" \
+uv run meteor.py encode --message "secret" --password "pass" \
   --context "The history of ancient Rome"
 ```
 
@@ -34,11 +34,11 @@ python meteor.py encode --message "secret" --password "pass" \
 
 ```bash
 # Encode with custom context
-python meteor.py encode --message "secret" --password "pass" \
+uv run meteor.py encode --message "secret" --password "pass" \
   --context "The history of ancient Rome"
 
 # Decode
-python meteor.py decode --message "<stegotext>" --password "pass" \
+uv run meteor.py decode --message "<stegotext>" --password "pass" \
   --context "The history of ancient Rome"
 ```
 
