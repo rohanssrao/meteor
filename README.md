@@ -1,18 +1,18 @@
 # Meteor
 
-Cryptographically secure steganography using Qwen3-0.6B.
+Cryptographically secure language-model steganography.
 
-Meteor encodes secret messages into innocent-looking AI-generated text. The encoded messages are statistically indistinguishable from regular LLM outputs.
+Meteor encodes secret messages into innocent-looking AI-generated text.
 
-This is an unofficial implementation of the ideas in the [original Meteor paper](https://eprint.iacr.org/2021/686) by Kaptchuk, Jois, Green, and Rubin, adapted for a modern LLM. An explanation of Meteor can be found at this link: https://meteorfrom.space
+This is an unofficial implementation of the ideas in the [original Meteor paper](https://eprint.iacr.org/2021/686) by Kaptchuk, Jois, Green, and Rubin, adapted for a modern LLM (LiquidAI/LFM2.5-230M). An explanation of Meteor can be found at this link: https://meteorfrom.space
 
 ## Usage
 
 ### With Docker
 
 ```bash
-docker run ghcr.io/rohanssrao/meteor:1.0.0 encode --message "secret" --password "pass"
-docker run ghcr.io/rohanssrao/meteor:1.0.0 decode --message "<stegotext>" --password "pass"
+docker run ghcr.io/rohanssrao/meteor:latest encode --message "secret" --password "pass"
+docker run ghcr.io/rohanssrao/meteor:latest decode --message "<stegotext>" --password "pass"
 ```
 
 ### With uv
@@ -47,4 +47,11 @@ uv run meteor.py decode --message "<stegotext>" --password "pass" \
 1. Your message is converted to bits
 2. These bits guide token selection from the LLM's probability distribution
 3. The selected tokens form natural-looking text
-4. Decoding reverses the process using the same password and context
+4. Only text-stable, single-line token choices are retained
+5. Decoding reconstructs the same distribution using the password and context
+
+## Technical Details
+
+Meteor uses Liquid AI's LFM2.5-230M-Base for fast local generation. A canonical-token filter guarantees stable re-tokenization, and cover text is restricted to one line with ordinary ASCII spaces for reliable copying and pasting.
+
+The model is downloaded automatically on first use with `uv`; the Docker image includes it. Encoding and decoding must use the same password, context, and unmodified stegotext.

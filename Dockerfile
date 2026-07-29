@@ -11,7 +11,8 @@ COPY meteor.py .
 
 # Pre-download the model
 RUN python -c "from transformers import AutoModelForCausalLM, AutoTokenizer; \
-    AutoTokenizer.from_pretrained('Qwen/Qwen3-0.6B', trust_remote_code=True); \
-    AutoModelForCausalLM.from_pretrained('Qwen/Qwen3-0.6B', trust_remote_code=True)"
+    revision='9d2be5519834990d30996f878b6771cccbd24f2c'; \
+    AutoTokenizer.from_pretrained('LiquidAI/LFM2.5-230M-Base', revision=revision); \
+    AutoModelForCausalLM.from_pretrained('LiquidAI/LFM2.5-230M-Base', revision=revision)"
 
 ENTRYPOINT ["python", "meteor.py"]
