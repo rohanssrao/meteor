@@ -20,12 +20,22 @@ and Avi Rubin: https://eprint.iacr.org/2021/686
 import argparse
 import hashlib
 import hmac
-import sys
+import os
 from dataclasses import dataclass
+
+# Keep successful CLI output limited to the generated or recovered message.
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 
 import torch
 import torch.nn.functional as F
+from huggingface_hub.utils import disable_progress_bars as disable_hf_progress_bars
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers.utils import logging as transformers_logging
+
+
+disable_hf_progress_bars()
+transformers_logging.disable_progress_bar()
+transformers_logging.set_verbosity_error()
 
 
 MODEL_NAME = "LiquidAI/LFM2.5-230M-Base"
@@ -86,22 +96,10 @@ class HmacBitstream:
         return result
 
 
-def is_model_cached(model_name: str) -> bool:
-    try:
-        from huggingface_hub import try_to_load_from_cache
-
-        return try_to_load_from_cache(model_name, "config.json") is not None
-    except Exception:
-        return True
-
-
 def load_runtime(seed: int = 1234) -> Runtime:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
-
-    if not is_model_cached(MODEL_NAME):
-        print(f"Downloading model {MODEL_NAME}...", file=sys.stderr, flush=True)
 
     tokenizer = AutoTokenizer.from_pretrained(
         MODEL_NAME,
